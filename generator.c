@@ -59,18 +59,40 @@ int change(void* ap,long pos){
     data=ap;
 
     FILE* outfile;
-    if ( (outfile = fopen("datadogs.dat", "wb")) == NULL )
+    if ( (outfile = fopen("datadogs.dat", "r+")) == NULL )
     {
         printf("Error opening file\n");
         return 1;   
     }
-    fseek(outfile,sizeof(struct Pet)*pos,SEEK_SET);
+    fseek(outfile,sizeof(struct Pet) *pos,SEEK_SET);
     fwrite(data, sizeof(struct Pet), 1, outfile);
     fclose(outfile);
     printf("\n write: %li \n",pos);
     return 0;
 }
 
+int readpos(long pos){
+    FILE* file;
+    file = fopen("datadogs.dat", "r+");
+    
+    fseek(file,sizeof(struct Pet)*pos,SEEK_SET);
+    struct Pet pet;
+    fread(&pet,sizeof(struct Pet),1,file);
+    printf("\n/////// readpos ///////\n");
+    printf("Nombre: %s",pet.name);	
+	    printf("\nTipo: %s",pet.type);
+	    printf("\nEdad: %i",pet.age);	
+	    printf("\nRaza: %s",pet.race);
+	    printf("\nAltura: %i",pet.height);	
+	    printf("\nPeso: %f",pet.weight);
+	    printf("\nSexo: %c",pet.gender);
+	    printf("\nNext: %i",pet.prev);
+	    printf("\nPrev: %i \n",pet.next);
+    fclose(file);
+    return 0;
+}
+
+//-----------MAIN---------------//
 int main(int argc, char* argv[])
 {
     struct Pet* pets = malloc(sizeof(struct Pet)*5);  
@@ -88,8 +110,11 @@ int main(int argc, char* argv[])
 	    pets[n].prev = n;
 	    pets[n].next = n;
     }
+    write(pets);
 
-    
+    read();
+
+        printf("\n/////// test ///////\n");
         sprintf(pet.name,"Perla");
         sprintf(pet.type,"Perro");
         pet.age = 321;
@@ -100,30 +125,11 @@ int main(int argc, char* argv[])
 	    pet.prev = 321;
 	    pet.next = 321;
         change(&pet,1);
-      /*
+    readpos(1);
 
-    FILE* file;
-    file = fopen("datadogs.dat", "rb");
-    
-    fseek(file,sizeof(struct Pet)*2,SEEK_SET);
-    struct Pet pet;
-    fread(&pet,sizeof(struct Pet),1,file);
-    printf("\n/////// test ///////\n");
-    printf("Nombre: %s",pet.name);	
-	    printf("\nTipo: %s",pet.type);
-	    printf("\nEdad: %i",pet.age);	
-	    printf("\nRaza: %s",pet.race);
-	    printf("\nAltura: %i",pet.height);	
-	    printf("\nPeso: %f",pet.weight);
-	    printf("\nSexo: %c",pet.gender);
-	    printf("\nNext: %i",pet.prev);
-	    printf("\nPrev: %i \n",pet.next);
-    fclose(file);
-    
-    */
-
+    printf("\n/////// after change ///////\n");
     read();
-    
+
     free(pets);
     return 0;
 }
