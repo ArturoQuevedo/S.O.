@@ -10,6 +10,8 @@ struct Pet
 	int height;
 	float weight;
 	char gender;
+	int prev;
+	int next;
 };
 
 int write(void* ap){
@@ -44,6 +46,8 @@ int read(){
 	    printf("\nAltura: %i",pet.height);	
 	    printf("\nPeso: %f",pet.weight);
 	    printf("\nSexo: %c \n",pet.gender);
+	    printf("\nNext: %i",pet.prev);
+	    printf("\nPrev: %i",pet.next);
     }
     fclose(infile);
 
@@ -63,6 +67,8 @@ int main(int argc, char* argv[])
 	    pets[n].height = n; 
 	    pets[n].weight = n;
 	    pets[n].gender='F';
+	    pets[n].prev = n;
+	    pets[n].next = n;
     }
 
     write(pets);
