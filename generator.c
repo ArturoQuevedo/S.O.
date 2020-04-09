@@ -100,7 +100,27 @@ int main(int argc, char* argv[])
 	    pet.prev = 321;
 	    pet.next = 321;
         change(&pet,1);
+      /*
+
+    FILE* file;
+    file = fopen("datadogs.dat", "rb");
     
+    fseek(file,sizeof(struct Pet)*2,SEEK_SET);
+    struct Pet pet;
+    fread(&pet,sizeof(struct Pet),1,file);
+    printf("\n/////// test ///////\n");
+    printf("Nombre: %s",pet.name);	
+	    printf("\nTipo: %s",pet.type);
+	    printf("\nEdad: %i",pet.age);	
+	    printf("\nRaza: %s",pet.race);
+	    printf("\nAltura: %i",pet.height);	
+	    printf("\nPeso: %f",pet.weight);
+	    printf("\nSexo: %c",pet.gender);
+	    printf("\nNext: %i",pet.prev);
+	    printf("\nPrev: %i \n",pet.next);
+    fclose(file);
+    
+    */
 
     read();
     
