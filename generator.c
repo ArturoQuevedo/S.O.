@@ -125,6 +125,83 @@ long readhash(int pos)
     return id;
 }
 
+//AQUI AGREGUÉ CODIGO
+char *setRace()
+{
+    char *race;
+    race = malloc(sizeof(char) * 16);
+    switch (rand() % 16)
+    {
+    case 0:
+        strcpy(race, "Schanauzer");
+        return (race);
+        break;
+    case 1:
+        strcpy(race, "Doberman");
+        return (race);
+        break;
+    case 2:
+        strcpy(race, "Chihuahua");
+        return (race);
+        break;
+    case 3:
+        strcpy(race, "Bulldog");
+        return (race);
+        break;
+    case 4:
+        strcpy(race, "Poodle");
+        return (race);
+        break;
+    case 5:
+        strcpy(race, "Beagle");
+        return (race);
+        break;
+    case 6:
+        strcpy(race, "Pug");
+        return (race);
+        break;
+    case 7:
+        strcpy(race, "Husky");
+        return (race);
+        break;
+    case 8:
+        strcpy(race, "Rottweiler");
+        return (race);
+        break;
+    case 9:
+        strcpy(race, "Corgi");
+        return (race);
+        break;
+    case 10:
+        strcpy(race, "ShihTzu");
+        return (race);
+        break;
+    case 11:
+        strcpy(race, "BorderCollie");
+        return (race);
+        break;
+    case 12:
+        strcpy(race, "GranDanes");
+        return (race);
+        break;
+    case 13:
+        strcpy(race, "PastorAleman");
+        return (race);
+        break;
+    case 14:
+        strcpy(race, "ChowChow");
+        return (race);
+        break;
+    case 15:
+        strcpy(race, "Dalmata");
+        return (race);
+        break;
+
+    default:
+        break;
+    }
+}
+
 //-----------MAIN---------------//
 int main(int argc, char *argv[])
 {
@@ -160,9 +237,9 @@ int main(int argc, char *argv[])
 
         struct Pet pet;
 
-        //Aquí se añade código
         line_count++;
-        sprintf(pet.name, line_buf);
+	//Aqui CAMBIE Codigo
+        strcpy(pet.name, line_buf);
         line_size = getline(&line_buf, &line_buf_size, fp);
         if (line_count >= 1716)
         {
@@ -178,60 +255,8 @@ int main(int argc, char *argv[])
         pet.age = rand() % 14;
         pet.height = rand() % 110;
         pet.weight = (rand() % 101) + ((rand() % 100) / 100.0);
-
-        switch (rand() % 16)
-        {
-        case 0:
-            sprintf(pet.race, "Schanauzer");
-            break;
-        case 1:
-            sprintf(pet.race, "Doberman");
-            break;
-        case 2:
-            sprintf(pet.race, "Chihuahua");
-            break;
-        case 3:
-            sprintf(pet.race, "Bulldog");
-            break;
-        case 4:
-            sprintf(pet.race, "Poodle");
-            break;
-        case 5:
-            sprintf(pet.race, "Beagle");
-            break;
-        case 6:
-            sprintf(pet.race, "Pug");
-            break;
-        case 7:
-            sprintf(pet.race, "Husky");
-            break;
-        case 8:
-            sprintf(pet.race, "Rottweiler");
-            break;
-        case 9:
-            sprintf(pet.race, "Corgi");
-            break;
-        case 10:
-            sprintf(pet.race, "ShihTzu");
-            break;
-        case 11:
-            sprintf(pet.race, "BorderCollie");
-            break;
-        case 12:
-            sprintf(pet.race, "GranDanes");
-            break;
-        case 13:
-            sprintf(pet.race, "Doberman");
-            break;
-        case 14:
-            sprintf(pet.race, "ChowChow");
-            break;
-        case 15:
-            sprintf(pet.race, "Dalmata");
-            break;
-        default:
-            break;
-        }
+	//Aqui CAMBIE codigo
+        strcpy(pet.race, setRace());	    
         switch (rand() % 2)
         {
         case 0:
