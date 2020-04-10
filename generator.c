@@ -231,7 +231,7 @@ long readhash(int pos)
 int writehash(int pos, long value)
 {
     FILE *file;
-    file = fopen("hash.bin", "r+");
+    file = fopen("hash.bin", "w+");
     fseek(file, sizeof(long) * pos, SEEK_SET);
     fwrite(&value, sizeof(long), 1, file);
     fclose(file);
@@ -275,6 +275,7 @@ int main(int argc, char *argv[])
 
         line_count++;
         strcpy(pet.name, line_buf);
+        sprintf(pet.name, "ABC");
         line_size = getline(&line_buf, &line_buf_size, fp);
         if (line_count >= 1716)
         {
