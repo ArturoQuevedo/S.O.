@@ -75,6 +75,7 @@ int change(void *ap, long pos)
 
 int readpos(long pos)
 {
+    
     FILE *file;
     file = fopen("datadogs.dat", "r+");
 
@@ -127,6 +128,19 @@ long readhash(int pos)
 //-----------MAIN---------------//
 int main(int argc, char *argv[])
 {
+    //Aquí se añade código
+    char *line_buf = NULL;
+    size_t line_buf_size = 0;
+    int line_count = 0;
+    ssize_t line_size;
+    FILE *fp = fopen("nombresMascotas.txt", "r");
+    if (!fp)
+    {
+        fprintf(stderr, "Error opening file 'names.txt'");
+        return EXIT_FAILURE;
+    }
+    line_size = getline(&line_buf, &line_buf_size, fp);
+    //Aquí termina el codigo añadido
 
     //GENERADOR DE TABLA HASH EN HASH.BIN
     FILE *file;
@@ -145,6 +159,17 @@ int main(int argc, char *argv[])
     {
 
         struct Pet pet;
+
+        //Aquí se añade código
+        line_count++;
+        sprintf(pet.name, line_buf);
+        line_size = getline(&line_buf, &line_buf_size, fp);
+        if (line_count >= 1716)
+        {
+            rewind(fp);
+            line_count = 0;
+        }
+        //Aquí termina el codigo añadido
 
         //EL NOMBRE SE LEE DEL TXT DE NOMBRES
         sprintf(pet.name, "ABC");
