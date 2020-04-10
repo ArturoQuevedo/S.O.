@@ -21,7 +21,7 @@ int write(void *ap)
     data = ap;
 
     FILE *outfile;
-    if ((outfile = fopen("datadogs.dat", "wb")) == NULL)
+    if ((outfile = fopen("datadogs.dat", "a")) == NULL)
     {
         printf("Error opening file\n");
         return 1;
@@ -75,6 +75,24 @@ int change(void *ap, long pos)
     fclose(outfile);
     printf("\n write: %li \n", pos);
     return 0;
+}
+
+int changenextNode(long value, long pos)
+{
+    struct Pet pet;
+
+    FILE *infile;
+    if ((infile = fopen("datadogs.dat", "r")) == NULL)
+    {
+        printf("Error opening file\n");
+        return 1;
+    }
+    fseek(infile, sizeof(struct Pet) * pos, SEEK_SET);
+    fread(&pet, sizeof(struct Pet), 1, infile);
+    pet.next = value;
+    fclose(infile);
+    change(&pet,pos);
+    return 0;    
 }
 
 char *setRace()
@@ -213,13 +231,16 @@ long readhash(int pos)
 int writehash(int pos, long value)
 {
     FILE *file;
-    file = fopen("hash.bin", "w+");
+    file = fopen("hash.bin", "r+");
     fseek(file, sizeof(long) * pos, SEEK_SET);
     fwrite(&value, sizeof(long), 1, file);
     fclose(file);
+    printf("\nwritehash de value: %li \n", value);
+    return 0;
 }
 
-//-----------MAIN---------------//
+
+//------------------------------MAIN----------------------------------//
 int main(int argc, char *argv[])
 {
     char *line_buf = NULL;
@@ -263,6 +284,7 @@ int main(int argc, char *argv[])
 
         //EL NOMBRE SE LEE DEL TXT DE NOMBRES
         sprintf(pet.type, "Perro");
+        
         pet.age = rand() % 14;
         pet.height = rand() % 110;
         pet.weight = (rand() % 101) + ((rand() % 100) / 100.0);
@@ -313,6 +335,7 @@ int main(int argc, char *argv[])
                 {
                     pet.prev = current_node;
                     pet.next = -1;
+                    changenextNode(i,current_node);
                     break;
                 }
                 current_node = temp;
@@ -320,8 +343,9 @@ int main(int argc, char *argv[])
             
         }
 
-        change(&pet, i);
+        write(&pet);
     }
+    fclose(fp);
     read();
     return 0;
 }
