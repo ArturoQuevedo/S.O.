@@ -126,6 +126,7 @@ long readhash(int pos)
 }
 
 //AQUI AGREGUÉ CODIGO
+//FUNCION BIEN MAMALONA ahhahahahahahahahahahahahahhaahhahahahaha
 char *setRace()
 {
     char *race;
@@ -238,7 +239,9 @@ int main(int argc, char *argv[])
         struct Pet pet;
 
         line_count++;
-	//Aqui CAMBIE Codigo
+	//asdfghjhgfdsasdfghjhgfdsasdfghgfdsdfghgfSDFSDFFDSF
+	    
+	//LA LINEA DE ABAJO LA CAMBIE PARA QUE NO MANDARA ADVERTENCIAS
         strcpy(pet.name, line_buf);
         line_size = getline(&line_buf, &line_buf_size, fp);
         if (line_count >= 1716)
@@ -246,7 +249,6 @@ int main(int argc, char *argv[])
             rewind(fp);
             line_count = 0;
         }
-        //Aquí termina el codigo añadido
 
         //EL NOMBRE SE LEE DEL TXT DE NOMBRES
         sprintf(pet.name, "ABC");
@@ -255,7 +257,8 @@ int main(int argc, char *argv[])
         pet.age = rand() % 14;
         pet.height = rand() % 110;
         pet.weight = (rand() % 101) + ((rand() % 100) / 100.0);
-	//Aqui CAMBIE codigo
+	//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4
+	//LA LINEA DE ABAJO LA CAMBIE PARA QUE NO MANDARA ADVERTENCIAS
         strcpy(pet.race, setRace());	    
         switch (rand() % 2)
         {
