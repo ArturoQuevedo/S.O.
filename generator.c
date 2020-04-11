@@ -261,7 +261,6 @@ int main(int argc, char *argv[])
     FILE *file;
     file = fopen("hash.bin", "w");
 
-    long test = -2;
     for (int i = 0; i < 1000; i++)
     {
         fwrite(&temp, sizeof(long), 1, file);
