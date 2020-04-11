@@ -91,8 +91,8 @@ int changenextNode(long value, long pos)
     fread(&pet, sizeof(struct Pet), 1, infile);
     pet.next = value;
     fclose(infile);
-    change(&pet,pos);
-    return 0;    
+    change(&pet, pos);
+    return 0;
 }
 
 char *setRace()
@@ -197,31 +197,31 @@ long getnextNode(long pos)
 //----funciones para la tabla HASH----
 
 //calcula el resultado de la funcion hash y lo retorna
-int hashfunction(char name[32])
+long hashfunction(char name[32])
 {
-    int result = 0;
+    long result = 0;
     int i = 0;
     while (name[i] != '\0')
     {
-        result = result + (int)name[i];
+        result = result + (long)name[i];
         i++;
     }
     result = result % 1000;
-    printf("\nhash result: %i \n", result);
+    printf("\nhash result: %li \n", result);
     return result;
 }
 
 //devuelve el id almacenado en la posicion dada
-long readhash(int pos)
+long readhash(long pos)
 {
     FILE *file;
-    file = fopen("hash.bin", "r+");
+    file = fopen("hash.bin", "r");
 
-    fseek(file, sizeof(int) * pos, SEEK_SET);
+    fseek(file, sizeof(long) * pos, SEEK_SET);
     long id;
     fread(&id, sizeof(long), 1, file);
     printf("\n/////// id: ///////\n");
-    printf("pos: %i", pos);
+    printf("pos: %li", pos);
     printf("\nid: %li \n", id);
     fclose(file);
     return id;
@@ -230,15 +230,14 @@ long readhash(int pos)
 //cambia el valor almacenado en una posicion dada
 int writehash(int pos, long value)
 {
-    FILE *file;
-    file = fopen("hash.bin", "w+");
-    fseek(file, sizeof(long) * pos, SEEK_SET);
-    fwrite(&value, sizeof(long), 1, file);
-    fclose(file);
+    FILE *ftc;
+    ftc = fopen("hash.bin", "r+");
+    fseek(ftc, sizeof(long) * pos, SEEK_SET);
+    fwrite(&value, sizeof(long), 1, ftc);
+    fclose(ftc);
     printf("\nwritehash de value: %li \n", value);
     return 0;
 }
-
 
 //------------------------------MAIN----------------------------------//
 int main(int argc, char *argv[])
@@ -247,6 +246,9 @@ int main(int argc, char *argv[])
     size_t line_buf_size = 0;
     int line_count = 0;
     ssize_t line_size;
+    long temp = -1;
+    long current_node = -1;
+
     FILE *fp = fopen("nombresMascotas.txt", "r");
     if (!fp)
     {
@@ -257,14 +259,17 @@ int main(int argc, char *argv[])
 
     //GENERADOR DE TABLA HASH EN HASH.BIN
     FILE *file;
-    file = fopen("hash.bin", "w+");
-    long temp = -1;
-    long current_node;
+    file = fopen("hash.bin", "w");
 
+    long test = -2;
     for (int i = 0; i < 1000; i++)
     {
         fwrite(&temp, sizeof(long), 1, file);
     }
+    fclose(file);
+
+    //TRUNCATE datadogs.dat
+    file = fopen("datadogs.dat", "w");
     fclose(file);
 
     //GENERADOR RANDOM DE MASCOTAS EN DATADOGS.DAT
@@ -275,7 +280,7 @@ int main(int argc, char *argv[])
 
         line_count++;
         strcpy(pet.name, line_buf);
-        sprintf(pet.name, "ABC");
+        sprintf(pet.name, "ABCD"); //Dato quemado para pruebasssssssss
         line_size = getline(&line_buf, &line_buf_size, fp);
         if (line_count >= 1716)
         {
@@ -285,7 +290,7 @@ int main(int argc, char *argv[])
 
         //EL NOMBRE SE LEE DEL TXT DE NOMBRES
         sprintf(pet.type, "Perro");
-        
+
         pet.age = rand() % 14;
         pet.height = rand() % 110;
         pet.weight = (rand() % 101) + ((rand() % 100) / 100.0);
@@ -328,20 +333,19 @@ int main(int argc, char *argv[])
         }
         else
         {
-            while (1==1)
+            while (1 == 1)
             {
                 //temp toma el valor del next node que se tiene guardado
                 temp = getnextNode(current_node);
-                if(temp == -1)
+                if (temp == -1)
                 {
                     pet.prev = current_node;
                     pet.next = -1;
-                    changenextNode(i,current_node);
+                    changenextNode(i, current_node);
                     break;
                 }
                 current_node = temp;
             }
-            
         }
 
         write(&pet);
