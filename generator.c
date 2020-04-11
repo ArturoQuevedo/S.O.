@@ -21,9 +21,9 @@ int write(void *ap)
     data = ap;
 
     FILE *outfile;
-    if ((outfile = fopen("datadogs.dat", "a")) == NULL)
+    if ((outfile = fopen("datadogs.dat", "a+")) == NULL)
     {
-        printf("Error opening file\n");
+        printf("Error opening file in write\n");
         return 1;
     }
     fwrite(data, sizeof(struct Pet), 1, outfile);
@@ -35,7 +35,7 @@ int read()
     FILE *infile;
     if ((infile = fopen("datadogs.dat", "rb")) == NULL)
     {
-        printf("Error opening file\n");
+        printf("Error opening file in read\n");
         return 1;
     }
 
@@ -67,7 +67,7 @@ int change(void *ap, long pos)
     FILE *outfile;
     if ((outfile = fopen("datadogs.dat", "r+")) == NULL)
     {
-        printf("Error opening file\n");
+        printf("Error opening file in change\n");
         return 1;
     }
     fseek(outfile, sizeof(struct Pet) * pos, SEEK_SET);
@@ -84,7 +84,7 @@ int changenextNode(long value, long pos)
     FILE *infile;
     if ((infile = fopen("datadogs.dat", "r+")) == NULL)
     {
-        printf("Error opening file\n");
+        printf("Error opening file in change next node\n");
         return 1;
     }
     fseek(infile, sizeof(struct Pet) * pos, SEEK_SET);
@@ -191,6 +191,7 @@ long getnextNode(long pos)
 
     fread(&pet, sizeof(struct Pet), 1, file);
     //printf("\nnext node: %li \n", pet.next);
+    fclose(file);
     return pet.next;
 }
 
@@ -277,7 +278,7 @@ int main(int argc, char *argv[])
     struct Pet pet;
 
     //GENERADOR RANDOM DE MASCOTAS EN DATADOGS.DAT
-    for (long i = 0; i < 2000; i++)
+    for (long i = 0; i < 10000000; i++)
     {
         line_count++;
         strcpy(pet.name, line_buf);
