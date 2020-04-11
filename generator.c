@@ -73,7 +73,7 @@ int change(void *ap, long pos)
     fseek(outfile, sizeof(struct Pet) * pos, SEEK_SET);
     fwrite(data, sizeof(struct Pet), 1, outfile);
     fclose(outfile);
-    printf("\n write: %li \n", pos);
+    //printf("\n write: %li \n", pos);
     return 0;
 }
 
@@ -82,7 +82,7 @@ int changenextNode(long value, long pos)
     struct Pet pet;
 
     FILE *infile;
-    if ((infile = fopen("datadogs.dat", "r")) == NULL)
+    if ((infile = fopen("datadogs.dat", "r+")) == NULL)
     {
         printf("Error opening file\n");
         return 1;
@@ -190,7 +190,7 @@ long getnextNode(long pos)
     struct Pet pet;
 
     fread(&pet, sizeof(struct Pet), 1, file);
-    printf("\nnext node: %li \n", pet.next);
+    //printf("\nnext node: %li \n", pet.next);
     return pet.next;
 }
 
@@ -200,14 +200,18 @@ long getnextNode(long pos)
 long hashfunction(char name[32])
 {
     long result = 0;
-    int i = 0;
+    long i = 0;
     while (name[i] != '\0')
     {
-        result = result + (long)name[i];
+        if ((long)name[i] != 10)
+        {
+            result = result + (long)name[i];
+        }        
         i++;
     }
     result = result % 1000;
-    printf("\nhash result: %li \n", result);
+    //printf("\nhash result: %li \n", result);
+    
     return result;
 }
 
@@ -215,14 +219,14 @@ long hashfunction(char name[32])
 long readhash(long pos)
 {
     FILE *file;
-    file = fopen("hash.bin", "r");
+    file = fopen("hash.bin", "r+");
 
     fseek(file, sizeof(long) * pos, SEEK_SET);
     long id;
     fread(&id, sizeof(long), 1, file);
-    printf("\n/////// id: ///////\n");
-    printf("pos: %li", pos);
-    printf("\nid: %li \n", id);
+    //printf("\n/////// id: ///////\n");
+    //printf("pos: %li", pos);
+    //printf("\nid: %li \n", id);
     fclose(file);
     return id;
 }
@@ -235,7 +239,7 @@ int writehash(int pos, long value)
     fseek(ftc, sizeof(long) * pos, SEEK_SET);
     fwrite(&value, sizeof(long), 1, ftc);
     fclose(ftc);
-    printf("\nwritehash de value: %li \n", value);
+    //printf("\nwritehash de value: %li \n", value);
     return 0;
 }
 
@@ -244,12 +248,12 @@ int main(int argc, char *argv[])
 {
     char *line_buf = NULL;
     size_t line_buf_size = 0;
-    int line_count = 0;
+    long line_count = 0;
     ssize_t line_size;
     long temp = -1;
     long current_node = -1;
 
-    FILE *fp = fopen("nombresMascotas.txt", "r");
+    FILE *fp = fopen("nombresMascotas.txt", "r+");
     if (!fp)
     {
         fprintf(stderr, "Error opening file 'names.txt'");
@@ -259,7 +263,7 @@ int main(int argc, char *argv[])
 
     //GENERADOR DE TABLA HASH EN HASH.BIN
     FILE *file;
-    file = fopen("hash.bin", "w");
+    file = fopen("hash.bin", "w+");
 
     for (int i = 0; i < 1000; i++)
     {
@@ -268,18 +272,17 @@ int main(int argc, char *argv[])
     fclose(file);
 
     //TRUNCATE datadogs.dat
-    file = fopen("datadogs.dat", "w");
+    file = fopen("datadogs.dat", "w+");
     fclose(file);
+    struct Pet pet;
 
     //GENERADOR RANDOM DE MASCOTAS EN DATADOGS.DAT
-    for (int i = 0; i < 10; i++)
+    for (long i = 0; i < 2000; i++)
     {
-
-        struct Pet pet;
-
         line_count++;
         strcpy(pet.name, line_buf);
-        sprintf(pet.name, "ABCD"); //Dato quemado para pruebasssssssss
+        
+        //sprintf(pet.name, "ABCD"); //Dato quemado para pruebasssssssss
         line_size = getline(&line_buf, &line_buf_size, fp);
         if (line_count >= 1716)
         {
@@ -307,14 +310,14 @@ int main(int argc, char *argv[])
         default:
             break;
         }
-
+        printf("\n %li \n",i);
         printf("Nombre: %s", pet.name);
-        printf("\t %s", pet.type);
-        printf("\t%i años", pet.age);
-        printf("\n%s", pet.race);
-        printf("\t%i cm", pet.height);
-        printf("\t %0.2f kg", pet.weight);
-        printf("\nSexo: %c \n", pet.gender);
+        //printf("\t %s", pet.type);
+        //printf("\t%i años", pet.age);
+        //printf("\n%s", pet.race);
+        //printf("\t%i cm", pet.height);
+        //printf("\t %0.2f kg", pet.weight);
+        //printf("\nSexo: %c \n", pet.gender);
 
         //consulta con funcion hash en busca de estructuras con el mismo resultado
         temp = hashfunction(pet.name);
@@ -350,6 +353,7 @@ int main(int argc, char *argv[])
         write(&pet);
     }
     fclose(fp);
-    read();
+    readpos(1716);
+
     return 0;
 }
