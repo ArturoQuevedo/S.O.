@@ -32,11 +32,21 @@ int hashFunction(char *str)
     int len = strlen(new);
     //printf("len: %i\n", len);
 
+    printf("\n original: %s",new);
+
     for (hash = i = 0; i < len; ++i)
     {
+        if(new[i]>=65&&str[i]<=90)
+        {
+            hash += new[i]+32;
+            hash += (hash << 10);
+            hash ^= (hash >> 6);
+        }
+        else{
         hash += new[i];
         hash += (hash << 10);
         hash ^= (hash >> 6);
+        }
     }
 
     hash += (hash << 3);
