@@ -11,7 +11,6 @@ struct Pet
     int height;
     float weight;
     char gender;
-    long prev;
     long next;
 };
 
@@ -51,7 +50,6 @@ int read()
         printf("\nAltura: %i", pet.height);
         printf("\nPeso: %0.2f", pet.weight);
         printf("\nSexo: %c", pet.gender);
-        printf("\nPrev: %li", pet.prev);
         printf("\nNext: %li \n\n", pet.next);
     }
     fclose(infile);
@@ -157,6 +155,19 @@ char *setRace()
     return (race);
 }
 
+long longpow(long x, int n)
+{
+    long i;
+    long number = 1;
+
+    for (int i = 0; i < n; i++)
+    {
+        number *= x;
+    }
+    
+    return number;
+}
+
 //actualmente sin uso
 int readpos(long pos)
 {
@@ -175,7 +186,6 @@ int readpos(long pos)
     printf("\nAltura: %i", pet.height);
     printf("\nPeso: %0.2f", pet.weight);
     printf("\nSexo: %c", pet.gender);
-    printf("\nPrev: %li", pet.prev);
     printf("\nNext: %li \n", pet.next);
     fclose(file);
     return 0;
@@ -206,11 +216,11 @@ long hashfunction(char name[32])
     {
         if ((long)name[i] != 10)
         {
-            result = result + (long)name[i];
+            result = result + (((long)name[i])*longpow(167,i));
         }        
         i++;
     }
-    result = result % 1000;
+    result = result % 1801;
     //printf("\nhash result: %li \n", result);
     
     return result;
@@ -266,7 +276,7 @@ int main(int argc, char *argv[])
     FILE *file;
     file = fopen("hash.bin", "w+");
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 1801; i++)
     {
         fwrite(&temp, sizeof(long), 1, file);
     }
@@ -328,29 +338,31 @@ int main(int argc, char *argv[])
         if (current_node == -1)
         {
             //pet actual se convierte en head y tail de la lista
-            pet.prev = -1;
             pet.next = -1;
 
-            //se actualiza la hash table con pet como cabeza del nodo
-            writehash(temp, i);
         }
         else
         {
-            while (1 == 1)
-            {
-                //temp toma el valor del next node que se tiene guardado
-                temp = getnextNode(current_node);
-                if (temp == -1)
-                {
-                    pet.prev = current_node;
-                    pet.next = -1;
-                    changenextNode(i, current_node);
-                    break;
-                }
-                current_node = temp;
-            }
+            pet.next = current_node;
+            //while (1 == 1)
+            //{
+            //    //temp toma el valor del next node que se tiene guardado
+            //    temp = getnextNode(current_node);
+            //    if (temp == -1)
+            //    {
+            //        pet.prev = current_node;
+            //        pet.next = -1;
+            //        changenextNode(i, current_node);
+            //        break;
+            //    }
+            //    current_node = temp;
+            //}
         }
 
+        //se actualiza la hash table con pet como cabeza del nodo
+        writehash(temp, i);
+        
+        //se escribe la estructura en el archivo .dat
         write(&pet);
     }
     fclose(fp);
