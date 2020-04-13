@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <ctype.h>
 #define HASH_SIZE 1000
 
 struct dogType
@@ -32,20 +33,21 @@ int hashFunction(char *str)
     int len = strlen(new);
     //printf("len: %i\n", len);
 
-    printf("\n original: %s",new);
+    //printf("\n original: %s", new);
 
     for (hash = i = 0; i < len; ++i)
     {
-        if(new[i]>=65&&str[i]<=90)
+        if (new[i] >= 65 && str[i] <= 90)
         {
-            hash += new[i]+32;
+            hash += new[i] + 32;
             hash += (hash << 10);
             hash ^= (hash >> 6);
         }
-        else{
-        hash += new[i];
-        hash += (hash << 10);
-        hash ^= (hash >> 6);
+        else
+        {
+            hash += new[i];
+            hash += (hash << 10);
+            hash ^= (hash >> 6);
         }
     }
 
@@ -55,7 +57,8 @@ int hashFunction(char *str)
 
     return (int)fabs(hash % HASH_SIZE);
 }
-
+//---------------------initHash---------------------
+//1.36 min
 int initHash(int *hashTable)
 {
     for (int i = 0; i < HASH_SIZE; i++)
@@ -92,6 +95,7 @@ int initHash(int *hashTable)
     return 0;
 }
 
+//---------------------searchById---------------------
 int searchById()
 {
     int registerToSearch;
@@ -100,7 +104,7 @@ int searchById()
 
     printf("\nHay %i mascotas registradas", numRegistros);
     printf("\nRecuerde que el ID del primer perro es 0 y del último es %i", numRegistros - 1);
-    printf("\nIngrese el número de registro de la mascota que desea buscar\n");
+    printf("\nIngrese el número de registro de la pet que desea buscar\n");
     scanf("%i", &registerToSearch);
 
     if (registerToSearch < numRegistros && registerToSearch >= 0)
@@ -119,7 +123,7 @@ int searchById()
         fseek(file, registerToSearch * structSize, SEEK_SET);
         fread(pet, structSize, 1, file);
 
-        printf("\nSe encontró la mascota:");
+        printf("\nSe encontró la pet:");
         printf("\nNombre: %s", pet->name);
         printf("Tipo: %s", pet->type);
         printf("\tEdad: %i", pet->age);
@@ -148,19 +152,9 @@ int searchById()
                 strcat(fileHistClin, pet->name);
 
                 //Por algún motivo non agrega el .txt
-                //ASDFGHGFDSDFGHFD
-                strcat(fileHistClin, ".txt");
+                //strcat(fileHistClin,".txt");
 
-                //Crear la historia clinica si no existe
-                if ((file = fopen(fileHistClin, "r")) == NULL)
-                {
-                    //la instrucción es touch "fileHistClin"
-                    strcpy(consoleInstruct, "touch ");
-                    strcat(consoleInstruct, fileHistClin);
-
-                    system(consoleInstruct);
-                }
-                strcpy(consoleInstruct, "kate ");
+                strcat(consoleInstruct, "kate ");
                 strcat(consoleInstruct, fileHistClin);
 
                 system(consoleInstruct);
@@ -184,14 +178,83 @@ int searchById()
     {
         printf("El Numero de registro no es valido\n");
     }
+
     return 0;
 }
 
-int searchByName(int *hashTable){
-    
+//---------------------searchByName---------------------
+int searchByName(int *hashTable)
+{
+    char nameToSearch[32];
+    int hashValue;
+    int position;
+    int numCoincidencias = 1;
+    int len;
 
+    printf("\nIngrese el nombre que desea buscar\n");
+    scanf("%s", nameToSearch);
+    strcat(nameToSearch, "\n");
+
+    FILE *file;
+    file = fopen("datadogs.dat", "r");
+    if (!file)
+    {
+        fprintf(stderr, "Error opening file 'datadogs.dat'");
+        return EXIT_FAILURE;
+    }
+
+    struct dogType *pet;
+    pet = malloc(structSize);
+
+    //Los perros con el mismo nombre tienen el mismo valor hash
+    hashValue = hashFunction(nameToSearch);
+    position = hashTable[hashValue];
+    if (position == -1)
+    {
+        printf("\nNo hay coincidencias con este nombre");
+    }
+
+    while (position != -1)
+    {
+        fseek(file, position * structSize, SEEK_SET);
+        fread(pet, structSize, 1, file);
+
+        //convertir mayúsculas a minísculas
+        len = strlen(nameToSearch);
+        if (len == strlen(pet->name))
+        {
+            for (int i = 0; i < len; i++)
+            {
+                nameToSearch[i] = tolower(nameToSearch[i]);
+                pet->name[i] = tolower(pet->name[i]);
+            }
+
+            //El nombre de la pet que encontró coincide con el que busco?
+            if (strcmp(pet->name, nameToSearch) == 0)
+            {
+                printf("Coincidencia #: %i", numCoincidencias);
+                printf("\tPosición: %i", position);
+                printf("\tNombre: %s", pet->name);
+                //printf("Tipo: %s", pet->type);
+                //printf("\tEdad: %i", pet->age);
+                //printf("\nRaza: %s", pet->race);
+                //printf("\tAltura: %i", pet->height);
+                //printf("\nPeso: %0.2f", pet->weight);
+                //printf("\tSexo: %c", pet->gender);
+                numCoincidencias++;
+            }
+        }
+
+        position = pet->prev;
+    }
+    free(pet);
+    fclose(file);
+    printf("\nTerminó la búsqueda");
+
+    return 0;
 }
 
+//---------------------enterRegister---------------------
 void enterRegister(int *hashTable)
 {
     char nombre[32];
@@ -223,9 +286,9 @@ void enterRegister(int *hashTable)
         }
     }
 
-    printf("Ingrese la raza de su mascota:");
+    printf("Ingrese la raza de su pet:");
     scanf("%s", raza);
-    printf("Ingrese la estatura de su mascota:");
+    printf("Ingrese la estatura de su pet:");
 
     while (true)
     {
@@ -241,7 +304,7 @@ void enterRegister(int *hashTable)
         }
     }
 
-    printf("Ingrese el peso de su mascota:");
+    printf("Ingrese el peso de su pet:");
 
     while (true)
     {
@@ -257,7 +320,7 @@ void enterRegister(int *hashTable)
         }
     }
 
-    printf("Ingrese el sexo de su mascota:");
+    printf("Ingrese el sexo de su pet:");
 
     while (true)
     {
@@ -299,13 +362,51 @@ void enterRegister(int *hashTable)
     fclose(file);
 }
 
+//---------------------deleteFromFile---------------------
+int deleteFromFile(int *hashTable)
+{
+    
+    int index;
+    printf("\nHay %i mascotas registradas", numRegistros);
+    printf("\nRecuerde que el ID del primer perro es 0 y del último es %i", numRegistros - 1);
+    printf("\nIngrese el número de registro de la mascota que desea borrar\n");
+    scanf("%i", &index);
+
+    FILE *file;
+    FILE *temp;
+    temp = fopen("temp.dat", "w+");
+    file = fopen("datadogs.dat", "r");
+    fseek(file, 0, SEEK_SET);
+
+    struct dogType *pet;
+    pet = malloc(structSize);
+
+    for (int i = 1; fread(pet, structSize, 1, file); i++)
+    {
+        if (i != index)
+        {
+            fwrite(pet, structSize, 1, temp);
+        }
+    }
+
+    free(pet);
+    fclose(file);
+    fclose(temp);
+    system("rm datadogs.dat");
+    system("mv temp.dat datadogs.dat");
+    
+    numRegistros = 0;
+    initHash(hashTable);
+}
+
+//---------------------readAllDogs---------------------
 int readAllDogs() //NO usar con 10M perros
 {
     FILE *outfile;
     outfile = fopen("datadogs.dat", "rb");
     if (!outfile)
     {
-        fprintf(stderr, "Error opening file 'nombresMascotas.txt'");
+        fprintf(stderr, "Error opening file 'datadogs.dat'");
         return EXIT_FAILURE;
     }
 
@@ -328,6 +429,7 @@ int readAllDogs() //NO usar con 10M perros
     return 0;
 }
 
+//---------------------readSomeDogs---------------------
 int readSomeDogs() //Lee uno de cada 2M perros
 {
     int i = 0;
@@ -336,7 +438,7 @@ int readSomeDogs() //Lee uno de cada 2M perros
     outfile = fopen("datadogs.dat", "rb");
     if (!outfile)
     {
-        fprintf(stderr, "Error opening file 'nombresMascotas.txt'");
+        fprintf(stderr, "Error opening file 'datadogs.dat'");
         return EXIT_FAILURE;
     }
 
@@ -363,21 +465,56 @@ int readSomeDogs() //Lee uno de cada 2M perros
     fclose(outfile);
     return 0;
 }
-//------------------- MAIN -------------------
+
+//--------------------- MAIN ---------------------
 int main(int argc, char *argv[])
 {
 
     int hashTable[HASH_SIZE];
     initHash(hashTable);
 
-    //
+    int menu;
+    bool flag = true;
+    char esto_es_un_char[1];
 
-    //searchById();
+    while (flag)
+    {
 
-    //enterRegister(hashTable);
+        printf("\nMenuº:\n1. Ingresar registro");
+        printf("\n2. Ver registro");
+        printf("\n3. Borrar registro");
+        printf("\n4. Buscar registro \n5. Salir \n");
+        scanf("%i", &menu);
 
-    //readSomeDogs(); //NO usar con 10M perros
-    readAllDogs();
+        switch (menu)
+        {
+        case 1:
+            enterRegister(hashTable);
+            printf("\nPresione cualquier tecla y oprima enter para continuar \n");
+            scanf("%s", esto_es_un_char);
+            break;
+        case 2:
+            searchById();
+            printf("\nPresione cualquier tecla y oprima enter para continuar \n");
+            scanf("%s", esto_es_un_char);
+            break;
+        case 3:
+            deleteFromFile(hashTable);
+            printf("\nPresione cualquier tecla y oprima enter para continuar \n");
+            scanf("%s", esto_es_un_char);
+            break;
+        case 4:
+            searchByName(hashTable);
+            printf("\nPresione cualquier tecla y oprima enter para continuar \n");
+            scanf("%s", esto_es_un_char);
+            break;
+        case 5:
+            flag = false;
+            break;
+        default:
+            break;
+        }
+    }
 
     return 0;
 }
