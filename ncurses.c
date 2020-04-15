@@ -525,22 +525,22 @@ int main(int argc, char *argv[])
         {
         case 1:
             enterRegister(hashTable);
-            printw("\nPresione cualquier tecla y oprima enter para continuar \n");
+            printw("\nPresione cualquier tecla para continuar \n");
             getch();
             break;
         case 2:
             searchById();
-            printw("\nPresione cualquier tecla y oprima enter para continuar \n");
+            printw("\nPresione cualquier tecla para continuar \n");
             getch();
             break;
         case 3:
             deleteFromFile(hashTable);
-            printw("\nPresione cualquier tecla y oprima enter para continuar \n");
+            printw("\nPresione cualquier tecla para continuar \n");
             getch();
             break;
         case 4:
             searchByName(hashTable);
-            printw("\nPresione cualquier tecla y oprima enter para continuar \n");
+            printw("\nPresione cualquier tecla para continuar \n");
             getch();
             break;
         case 5:
