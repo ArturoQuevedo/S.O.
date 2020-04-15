@@ -351,12 +351,13 @@ void enterRegister(int *hashTable)
     int hashvalue = hashFunction(nombre);
     pet->prev = hashTable[hashvalue];
     hashTable[hashvalue] = numRegistros;
-    numRegistros++;
     //Sobreescribir
     FILE *file;
-    file = fopen("datadogs.dat", "a+");
+    file = fopen("datadogs.dat", "r+");
 
+    fseek(file, numRegistros * structSize, SEEK_SET);
     fwrite(pet, structSize, 1, file);
+    numRegistros++;
 
     free(pet);
     fclose(file);
@@ -365,38 +366,87 @@ void enterRegister(int *hashTable)
 //---------------------deleteFromFile---------------------
 int deleteFromFile(int *hashTable)
 {
-    
-    int index;
+    FILE *file;
+    int currentNode, hashValue, originalprev,position;
+
     printf("\nHay %i mascotas registradas", numRegistros);
     printf("\nRecuerde que el ID del primer perro es 0 y del último es %i", numRegistros - 1);
-    printf("\nIngrese el número de registro de la mascota que desea borrar\n");
-    scanf("%i", &index);
+    printf("\nIngrese el número de registro de la mascota que desea eliminar\n");
+    scanf("%i", &position);
 
-    FILE *file;
-    FILE *temp;
-    temp = fopen("temp.dat", "w+");
-    file = fopen("datadogs.dat", "r");
-    fseek(file, 0, SEEK_SET);
+    if(position>=numRegistros||position<0)
+    {
+        printf("valor de id invalido");
+        return 1;
+    }
+
+    file = fopen("datadogs.dat", "r+");
+
+    if (!file)
+    {
+        fprintf(stderr, "Error opening file 'datadogs.dat'");
+        return EXIT_FAILURE;
+    }
 
     struct dogType *pet;
     pet = malloc(structSize);
 
-    for (int i = 1; fread(pet, structSize, 1, file); i++)
+    fseek(file, position * structSize, SEEK_SET);
+    fread(pet, structSize, 1, file);
+
+    //valor del nodo anterior almacenado en el nodo que se quiere eliminar
+    originalprev = pet->prev;
+
+    hashValue = hashFunction(pet->name);
+    currentNode = hashTable[hashValue];
+
+    //eliminar referencias al nodo en cuestion
+    if(currentNode == position)
     {
-        if (i != index)
+        hashTable[hashValue] = originalprev;
+    }
+    else
+    {
+        while(1==1)
         {
-            fwrite(pet, structSize, 1, temp);
+            fseek(file, currentNode * structSize, SEEK_SET);
+            fread(pet, structSize, 1, file);
+            if(pet->prev==position)
+            {
+                pet->prev = originalprev;
+                fseek(file, currentNode * structSize, SEEK_SET);
+                fwrite(pet, structSize, 1, file);
+                break;
+            }
+
+            currentNode = pet->prev;
         }
     }
 
+    //tras haber eliminado las referencias se traslada ahora el úlitmo nodo a la posición dada
+    if(position == numRegistros-1)
+    {
+        numRegistros--;
+        free(pet);
+        fclose(file);
+        return 0;
+    }
+    else
+    {
+    fseek(file,(numRegistros-1) * structSize, SEEK_SET);
+    fread(pet, structSize, 1, file);
+
+    hashValue = hashFunction(pet->name);
+    hashTable[hashValue] = position;
+
+    fseek(file, position * structSize, SEEK_SET);
+    fwrite(pet, structSize, 1, file);
+
+    numRegistros--;
     free(pet);
     fclose(file);
-    fclose(temp);
-    system("rm datadogs.dat");
-    system("mv temp.dat datadogs.dat");
-    
-    numRegistros = 0;
-    initHash(hashTable);
+    return 0;
+    }
 }
 
 //---------------------readAllDogs---------------------
