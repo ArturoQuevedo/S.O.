@@ -163,7 +163,7 @@ int searchById()
             else if (openHistorial == 'N')
             {
                 //Que vergas hago
-                printf("\nAh, bueno");
+                //printf("\nAh, bueno");
                 break;
             }
             else
