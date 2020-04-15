@@ -225,6 +225,8 @@ int searchByName(int *hashTable)
         printw("\nNo hay coincidencias con este nombre");
     }
 
+    clear();
+
     while (position != -1)
     {
         fseek(file, position * structSize, SEEK_SET);
@@ -234,7 +236,6 @@ int searchByName(int *hashTable)
         len = strlen(nameToSearch);
         if (len == strlen(pet->name))
         {
-            clear();
             for (int i = 0; i < len; i++)
             {
                 nameToSearch[i] = tolower(nameToSearch[i]);
@@ -264,6 +265,8 @@ int searchByName(int *hashTable)
 
         position = pet->prev;
     }
+    getch();
+    clear();
     free(pet);
     fclose(file);
     printw("\nTerminó la búsqueda");
