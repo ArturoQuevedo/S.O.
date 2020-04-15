@@ -158,8 +158,16 @@ int searchById()
                 //Por algún motivo non agrega el .txt
                 //strcat(fileHistClin,".txt");
 
-                strcat(consoleInstruct, "kate ");
-                strcat(consoleInstruct, fileHistClin);
+                consoleInstruct[0] = 'k';
+                consoleInstruct[1] = 'a';
+                consoleInstruct[2] = 't';
+                consoleInstruct[3] = 'e';
+                consoleInstruct[4] = ' ';
+                for (int i = 0; i < strlen(fileHistClin); i++)
+                {
+                    consoleInstruct[5+i]=fileHistClin[i];
+                }
+                printw("\n instruct: %s \n",consoleInstruct);                
 
                 system(consoleInstruct);
                 break;
@@ -369,46 +377,23 @@ void enterRegister(int *hashTable)
 //---------------------deleteFromFile---------------------
 int deleteFromFile(int *hashTable)
 {
-    
-    int index;
+    FILE *file;
+    int currentNode, hashValue, originalprev,position;
+
     printw("\nHay %i mascotas registradas", numRegistros);
     printw("\nRecuerde que el ID del primer perro es 0 y del último es %i", numRegistros - 1);
-    printw("\nIngrese el número de registro de la mascota que desea borrar\n");
-    scanw("%i", &index);
+    printw("\nIngrese el número de registro de la mascota que desea eliminar\n");
+    scanw("%i", &position);
 
-    FILE *file;
-    FILE *temp;
-    temp = fopen("temp.dat", "w+");
-    file = fopen("datadogs.dat", "r");
-    fseek(file, 0, SEEK_SET);
-
-    struct dogType *pet;
-    pet = malloc(structSize);
-
-    for (int i = 1; fread(pet, structSize, 1, file); i++)
+    if(position>=numRegistros||position<0)
     {
-        if (i != index)
-        {
-            fwrite(pet, structSize, 1, temp);
-        }
+        printw("valor de id invalido");
+        return 1;
     }
 
-    free(pet);
-    fclose(file);
-    fclose(temp);
-    system("rm datadogs.dat");
-    system("mv temp.dat datadogs.dat");
-    
-    numRegistros = 0;
-    initHash(hashTable);
-}
+    file = fopen("datadogs.dat", "r+");
 
-//---------------------readAllDogs---------------------
-int readAllDogs() //NO usar con 10M perros
-{
-    FILE *outfile;
-    outfile = fopen("datadogs.dat", "rb");
-    if (!outfile)
+    if (!file)
     {
         printw("Error opening file 'datadogs.dat'");
         return EXIT_FAILURE;
@@ -417,20 +402,62 @@ int readAllDogs() //NO usar con 10M perros
     struct dogType *pet;
     pet = malloc(structSize);
 
-    while (fread(pet, structSize, 1, outfile))
+    fseek(file, position * structSize, SEEK_SET);
+    fread(pet, structSize, 1, file);
+
+    //valor del nodo anterior almacenado en el nodo que se quiere eliminar
+    originalprev = pet->prev;
+
+    hashValue = hashFunction(pet->name);
+    currentNode = hashTable[hashValue];
+
+    //eliminar referencias al nodo en cuestion
+    if(currentNode == position)
     {
-        printw("\nNombre: %s", pet->name);
-        printw("\tTipo: %s", pet->type);
-        printw("\nEdad: %i", pet->age);
-        printw("\tRaza: %s", pet->race);
-        printw("\nAltura: %i", pet->height);
-        printw("\tPeso: %0.2f", pet->weight);
-        printw("\nSexo: %c", pet->gender);
-        printw("\nprev: %i \n", pet->prev);
+        hashTable[hashValue] = originalprev;
     }
+    else
+    {
+        while(1==1)
+        {
+            fseek(file, currentNode * structSize, SEEK_SET);
+            fread(pet, structSize, 1, file);
+            if(pet->prev==position)
+            {
+                pet->prev = originalprev;
+                fseek(file, currentNode * structSize, SEEK_SET);
+                fwrite(pet, structSize, 1, file);
+                break;
+            }
+
+            currentNode = pet->prev;
+        }
+    }
+
+    //tras haber eliminado las referencias se traslada ahora el úlitmo nodo a la posición dada
+    if(position == numRegistros-1)
+    {
+        numRegistros--;
+        free(pet);
+        fclose(file);
+        return 0;
+    }
+    else
+    {
+    fseek(file,(numRegistros-1) * structSize, SEEK_SET);
+    fread(pet, structSize, 1, file);
+
+    hashValue = hashFunction(pet->name);
+    hashTable[hashValue] = position;
+
+    fseek(file, position * structSize, SEEK_SET);
+    fwrite(pet, structSize, 1, file);
+
+    numRegistros--;
     free(pet);
-    fclose(outfile);
+    fclose(file);
     return 0;
+    }
 }
 
 //---------------------readSomeDogs---------------------
