@@ -234,6 +234,7 @@ int searchByName(int *hashTable)
         len = strlen(nameToSearch);
         if (len == strlen(pet->name))
         {
+            clear();
             for (int i = 0; i < len; i++)
             {
                 nameToSearch[i] = tolower(nameToSearch[i]);
@@ -254,6 +255,10 @@ int searchByName(int *hashTable)
                 //printf("\tSexo: %c", pet->gender);
                 numCoincidencias++;
                 refresh();
+                if(numCoincidencias % 37 == 0){
+                    getch();
+                    clear();
+                }
             }
         }
 
@@ -286,7 +291,7 @@ void enterRegister(int *hashTable)
 
     while (true)
     {
-        scanf("%d", &edad);
+        scanw("%d", &edad);
         if (edad < 0)
         {
             printw("Edad invalida.");
@@ -521,6 +526,7 @@ int main(int argc, char *argv[])
         printw("\n2. Ver registro");
         printw("\n3. Borrar registro");
         printw("\n4. Buscar registro \n5. Salir \n");
+
         scanw("%i", &menu);
 
         switch (menu)
