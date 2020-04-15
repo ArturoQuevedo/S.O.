@@ -393,6 +393,8 @@ int deleteFromFile(int *hashTable)
 
     fseek(file, position * structSize, SEEK_SET);
     fread(pet, structSize, 1, file);
+    
+    printf("Se ha borrado el perro de ID %i, %s", position, pet->name);
 
     //valor del nodo anterior almacenado en el nodo que se quiere eliminar
     originalprev = pet->prev;
