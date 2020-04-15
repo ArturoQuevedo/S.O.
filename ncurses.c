@@ -253,6 +253,7 @@ int searchByName(int *hashTable)
                 //printf("\nPeso: %0.2f", pet->weight);
                 //printf("\tSexo: %c", pet->gender);
                 numCoincidencias++;
+                refresh();
             }
         }
 
