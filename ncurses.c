@@ -25,8 +25,7 @@ struct dogType
 int numRegistros = 0;
 int structSize = sizeof(struct dogType);
 
-//Funcion hash tomada de:
-//https://stackoverflow.com/questions/7666509/hash-function-for-string
+
 int hashFunction(char *str)
 {
     char new[32];
@@ -175,7 +174,7 @@ int searchById()
             else if (openHistorial == 'N')
             {
                 //Que vergas hago
-                printw("\nAh, bueno");
+                //printw("\nAh, bueno");
                 break;
             }
             else
@@ -405,6 +404,8 @@ int deleteFromFile(int *hashTable)
     fseek(file, position * structSize, SEEK_SET);
     fread(pet, structSize, 1, file);
 
+    printw("Se ha borrado el perro de ID %i, %s", position, pet->name);
+    
     //valor del nodo anterior almacenado en el nodo que se quiere eliminar
     originalprev = pet->prev;
 
@@ -525,22 +526,22 @@ int main(int argc, char *argv[])
         {
         case 1:
             enterRegister(hashTable);
-            printw("\nPresione cualquier tecla para continuar \n");
+            printw("\nPresione cualquier tecla para continuar\n");
             getch();
             break;
         case 2:
             searchById();
-            printw("\nPresione cualquier tecla para continuar \n");
+            printw("\nPresione cualquier tecla para continuar\n");
             getch();
             break;
         case 3:
             deleteFromFile(hashTable);
-            printw("\nPresione cualquier tecla para continuar \n");
+            printw("\nPresione cualquier tecla para continuar\n");
             getch();
             break;
         case 4:
             searchByName(hashTable);
-            printw("\nPresione cualquier tecla para continuar \n");
+            printw("\nPresione cualquier tecla para continuar\n");
             getch();
             break;
         case 5:
